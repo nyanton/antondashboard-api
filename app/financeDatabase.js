@@ -9,7 +9,7 @@ const dbCollection = `movie`;
 
 class FinanceDatabase {
 
-    constructor(){
+    constructor() {
         this.client;
     }
     async openConnection() {
@@ -19,68 +19,87 @@ class FinanceDatabase {
 
         let collection = this.client.db(dbName).collection(dbCollection);
 
+        console.log(`Opening connection...`);
+
         return collection;
     }
 
     async closeConnection() {
         await this.client.close();
-        console.log(`connection is closed`);
+        console.log(`Connection has been closed!`);
     }
 
     async addEntry(source, amount, income, date) {
 
         let collection = await this.openConnection();
 
-        await collection.insertOne({ source: source, amount: amount, income: income, date: date });
+        try {
+            await collection.insertOne({ source: source, amount: amount, income: income, date: date });
+        }
+        catch (error) {
+            console.error(`Something has gone wrong:  ${error}`);
+        }
 
         await this.closeConnection();
     }
 
-    async getAllEntries(){
-        try{
+    async getAllEntries() {
+        try {
 
             let collection = await this.openConnection();
-    
+
             let entries = await collection.find()
             let entriesArray = await entries.toArray();
-    
+
             await this.closeConnection();
-    
+
             return entriesArray;
         }
-        catch(error){
-            console.log(error);
+        catch (error) {
+            console.error(error);
         }
     }
 
-    async getEntry(id){
-        let collection = await this.openConnection();
+    async getEntry(id) {
+        try {
 
-        let entry = await collection.findOne({_id: ObjectId(id)});
+            let collection = await this.openConnection();
 
-        console.log(entry);
-        await this.closeConnection();
+            let entry = await collection.findOne({ _id: ObjectId(id) });
 
-        return entry;
+
+            await this.closeConnection();
+
+            return entry;
+        }
+        catch(error){
+            console.error(`Something has gone wrong:  ${error}`);
+        }
+
     }
 
-    async removeEntry(id){
+    async removeEntry(id) {
         let collection = await this.openConnection();
 
+        try {
+            await collection.deleteOne({ _id: ObjectId(id) });
+        }
+        catch (error) {
+            console.error(`Something has gone wrong:  ${error}`);
+
+        }
+
+        await this.closeConnection();
+    }
+
+    async editEntry(id, entry) {
+        let collection = await this.openConnection();
         try{
-            await collection.deleteOne({_id: ObjectId(id)});
+            await collection.findOneAndUpdate({ _id: ObjectId(id) }, { $set: entry });
         }
         catch(error){
-            console.log(error);
+            console.error(`Something has gone wrong:  ${error}`);
         }
-
-        await this.closeConnection();
-    }
-
-    async editEntry(id, entry){
-        let collection = await this.openConnection();
-
-        await collection.findOneAndUpdate({_id: ObjectId(id)}, {$set: entry});
 
         await this.closeConnection();
     }

@@ -2,14 +2,18 @@
   "name": "dashboard-api",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "./app/financeAPI.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon ./app/financeAPI.js"
   },
   "author": "anton",
   "license": "ISC",
   "dependencies": {
     "express": "^4.17.1",
     "mongodb": "^3.5.4"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.2"
   }
 }
